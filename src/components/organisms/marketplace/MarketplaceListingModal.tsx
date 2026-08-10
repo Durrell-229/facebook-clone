@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { IMarketplaceListing } from '../../../types/marketplace';
+import { IJobListing } from '../../../types/job';
 
 interface Props {
-  listing: IMarketplaceListing;
+  listing: IJobListing;
   onClose: () => void;
 }
 
 const MarketplaceListingModal: React.FC<Props> = ({ listing, onClose }) => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [message, setMessage] = useState('Good evening, is this still available?');
+  const [message, setMessage] = useState('Bonjour, je suis intéressé(e) par cette offre.');
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -68,8 +68,8 @@ const MarketplaceListingModal: React.FC<Props> = ({ listing, onClose }) => {
           >
             <i className="fas fa-times text-sm"></i>
           </button>
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary md:h-9 md:w-9">
-            <i className="fab fa-facebook-f text-sm text-white"></i>
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-tr from-primary to-hub-cyan md:h-9 md:w-9">
+            <i className="fas fa-code text-sm text-white"></i>
           </div>
         </div>
 
@@ -129,18 +129,20 @@ const MarketplaceListingModal: React.FC<Props> = ({ listing, onClose }) => {
         <div className="flex-1 overflow-y-auto p-4">
           {/* Title, price, listed */}
           <h2 className="text-lg font-bold text-black dark:text-white sm:text-xl">{listing.title}</h2>
-          <p className="mt-1 text-sm font-semibold text-gray-700 dark:text-gray-300">
-            {listing.isFree ? 'FREE' : `BDT${listing.price.toLocaleString()}`}
+          <p className="mt-1 text-sm font-semibold text-primary dark:text-hub-cyan">
+            {listing.isFree
+              ? 'Open Source'
+              : `${listing.salary.toLocaleString('fr-FR')} €/an`}
           </p>
           <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-            Listed {listing.listedAgo ?? 'recently'} in {listing.location}
+            Publié {listing.listedAgo ?? 'récemment'} · {listing.location}
           </p>
 
           {/* Action buttons */}
           <div className="mt-3 flex gap-2">
             <button className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-100 py-2 text-sm font-semibold text-primary hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-900/50">
-              <i className="fas fa-comment-dots text-xs"></i>
-              Message
+              <i className="fas fa-paper-plane text-xs"></i>
+              Postuler
             </button>
             <button
               onClick={() => setSaved((s) => !s)}
@@ -162,11 +164,11 @@ const MarketplaceListingModal: React.FC<Props> = ({ listing, onClose }) => {
 
           {/* Details */}
           <div className="mt-4">
-            <h3 className="mb-2 text-base font-bold text-black dark:text-white">Details</h3>
-            {listing.condition && (
+            <h3 className="mb-2 text-base font-bold text-black dark:text-white">Détails</h3>
+            {listing.contractType && (
               <div className="flex items-start justify-between py-1">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Condition</span>
-                <span className="text-right text-sm text-black dark:text-white">{listing.condition}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Type de contrat</span>
+                <span className="text-right text-sm text-black dark:text-white">{listing.contractType}</span>
               </div>
             )}
             {listing.description && (
@@ -179,7 +181,7 @@ const MarketplaceListingModal: React.FC<Props> = ({ listing, onClose }) => {
                     onClick={() => setShowFullDesc(true)}
                     className="mt-1 text-sm font-semibold text-primary"
                   >
-                    ... See more
+                    ... Voir plus
                   </button>
                 )}
               </div>
@@ -213,38 +215,38 @@ const MarketplaceListingModal: React.FC<Props> = ({ listing, onClose }) => {
               </button>
             </div>
             <p className="mt-1.5 text-sm font-semibold text-black dark:text-white">{listing.location}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">Location is approximate</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Localisation approximative</p>
           </div>
 
-          {/* Seller information */}
+          {/* Company information */}
           <div className="mt-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-black dark:text-white">Seller information</h3>
-              <button className="text-sm font-semibold text-primary hover:underline">Seller details</button>
+              <h3 className="text-base font-bold text-black dark:text-white">Entreprise</h3>
+              <button className="text-sm font-semibold text-primary hover:underline">Détails</button>
             </div>
-            {listing.seller && (
+            {listing.company && (
               <div className="mt-2 space-y-2">
                 <div className="flex items-center space-x-3">
                   <div className="relative shrink-0">
                     <img
-                      src={listing.seller.dp ?? 'https://random.imagecdn.app/200/200'}
-                      alt={listing.seller.name}
+                      src={listing.company.dp ?? 'https://random.imagecdn.app/200/200'}
+                      alt={listing.company.name}
                       className="h-10 w-10 rounded-full object-cover"
                     />
                     <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-green-500 dark:border-[#242526]"></span>
                   </div>
-                  <p className="text-sm font-semibold text-black dark:text-white">{listing.seller.name}</p>
+                  <p className="text-sm font-semibold text-black dark:text-white">{listing.company.name}</p>
                 </div>
-                {listing.seller.responsive && (
+                {listing.company.responsive && (
                   <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                     <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-green-500"></span>
-                    Very Responsive on Marketplace
+                    Répond très vite aux candidatures
                   </div>
                 )}
-                {listing.seller.joinedYear && (
+                {listing.company.joinedYear && (
                   <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                    <i className="fab fa-facebook text-base text-primary"></i>
-                    Joined Facebook in {listing.seller.joinedYear}
+                    <i className="fas fa-code text-base text-primary"></i>
+                    Membre SyntaxHub depuis {listing.company.joinedYear}
                   </div>
                 )}
               </div>
@@ -255,8 +257,8 @@ const MarketplaceListingModal: React.FC<Props> = ({ listing, onClose }) => {
         {/* Fixed bottom: message input */}
         <div className="border-t border-gray-200 p-3 dark:border-neutral-700 sm:p-4">
           <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-black dark:text-white">
-            <i className="fab fa-facebook-messenger text-primary"></i>
-            Send seller a message
+            <i className="fas fa-comments text-primary"></i>
+            Envoyer un message à l’entreprise
           </div>
           <textarea
             value={message}
@@ -264,8 +266,8 @@ const MarketplaceListingModal: React.FC<Props> = ({ listing, onClose }) => {
             rows={2}
             className="mb-2 w-full resize-none rounded-lg bg-gray-100 px-3 py-2 text-sm text-black focus:outline-none dark:bg-neutral-700 dark:text-white"
           />
-          <button className="w-full rounded-lg bg-primary py-2 text-sm font-semibold text-white hover:bg-blue-700">
-            Send
+          <button className="w-full rounded-lg bg-primary py-2 text-sm font-semibold text-white hover:bg-primary-dark">
+            Envoyer
           </button>
         </div>
       </div>

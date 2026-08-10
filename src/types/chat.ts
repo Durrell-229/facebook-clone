@@ -6,7 +6,7 @@ export interface IChat {
     dp: string;
     isOnline?: boolean;
     isGroup?: boolean;
-    isMetaAI?: boolean;
+    isAI?: boolean;
   };
   lastMessage: string;
   time: string;

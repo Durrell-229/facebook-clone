@@ -1,4 +1,4 @@
-export interface IMarketplaceSeller {
+export interface IJobCompany {
   _id: string;
   name: string;
   dp?: string;
@@ -6,17 +6,17 @@ export interface IMarketplaceSeller {
   joinedYear?: number;
 }
 
-export interface IMarketplaceListing {
+export interface IJobListing {
   _id: string;
-  price: number;
+  salary: number;
   isFree?: boolean;
   title: string;
   location: string;
   image: string;
   images?: string[];
   category: string;
-  condition?: string;
+  contractType?: string;
   description?: string;
   listedAgo?: string;
-  seller?: IMarketplaceSeller;
+  company?: IJobCompany;
 }

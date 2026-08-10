@@ -30,7 +30,7 @@ const SharesModal: React.FC<IProps> = ({ post, isOpen, onClose }) => {
           </div>
 
           {/* List */}
-          <div className="fb-scrollbar min-h-0 flex-1 overflow-y-auto">
+          <div className="hub-scrollbar min-h-0 flex-1 overflow-y-auto">
             {post.sharesData.length === 0 ? (
               <p className="mt-10 text-center text-sm text-gray-400">
                 No one has shared this post yet.

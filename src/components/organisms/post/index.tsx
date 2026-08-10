@@ -1,6 +1,9 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import moment from 'moment';
 import React, { useState } from 'react';
+import { useAuth } from '../../../context/AuthContext';
+import { useRealtimeLike } from '../../../hooks/useRealtime';
+import { supabase } from '../../../lib/supabase';
 import { IPost } from '../../../types/post';
 import PostModal from './PostModal';
 import SharesModal from './SharesModal';
@@ -18,33 +21,53 @@ interface IMenuAction {
 
 const menuGroups: IMenuAction[][] = [
   [
-    { icon: 'fas fa-plus-circle', label: 'Interested', description: 'More of your posts will be like this.' },
-    { icon: 'fas fa-minus-circle', label: 'Not interested', description: 'Less of your posts will be like this.' },
+    { icon: 'fas fa-plus-circle', label: 'Intéressé', description: 'Vos posts seront davantage de ce type.' },
+    { icon: 'fas fa-minus-circle', label: 'Pas intéressé', description: 'Moins de posts de ce type.' },
   ],
   [
-    { icon: 'fas fa-bookmark', label: 'Save post', description: 'Add this to your saved items.' },
+    { icon: 'fas fa-bookmark', label: 'Enregistrer le post', description: 'Ajouter à vos éléments enregistrés.' },
   ],
   [
-    { icon: 'fas fa-bell', label: 'Turn on notifications for this post' },
-    { icon: 'fas fa-info-circle', label: 'Why am I seeing this post?' },
-    { icon: 'fas fa-code', label: 'Embed' },
+    { icon: 'fas fa-bell', label: 'Activer les notifications pour ce post' },
+    { icon: 'fas fa-info-circle', label: 'Pourquoi voir ce post ?' },
+    { icon: 'fas fa-code', label: 'Intégrer (embed)' },
   ],
   [
-    { icon: 'fas fa-times-circle', iconColor: 'text-red-500', label: 'Hide post', description: 'See fewer posts like this.' },
-    { icon: 'fas fa-clock', label: 'Snooze for 30 days', description: 'Temporarily stop seeing posts.' },
-    { icon: 'fas fa-user-slash', iconColor: 'text-red-500', label: 'Unfollow', description: "Stop seeing posts from this Page. They won't be notified that you unfollowed." },
-    { icon: 'fas fa-exclamation-circle', iconColor: 'text-red-500', label: 'Report post', description: "We won't let them know who reported this." },
-    { icon: 'fas fa-user-times', iconColor: 'text-red-500', label: 'Block profile', description: "You won't be able to see or contact each other." },
+    { icon: 'fas fa-times-circle', iconColor: 'text-red-500', label: 'Masquer le post', description: 'Voir moins de posts de ce type.' },
+    { icon: 'fas fa-clock', label: 'Mettre en pause 30 jours', description: 'Arrêter temporairement de voir ces posts.' },
+    { icon: 'fas fa-user-slash', iconColor: 'text-red-500', label: 'Ne plus suivre', description: 'Ne plus voir les posts de ce membre. Il ne sera pas notifié.' },
+    { icon: 'fas fa-exclamation-circle', iconColor: 'text-red-500', label: 'Signaler le post', description: 'Nous ne les informerons pas de ce signalement.' },
+    { icon: 'fas fa-user-times', iconColor: 'text-red-500', label: 'Bloquer le profil', description: 'Vous ne pourrez plus vous voir ou vous contacter.' },
   ],
 ];
 
 const CAPTION_LIMIT = 120;
 
 const Post: React.FC<IProps> = ({ post }) => {
+  const { user: authUser } = useAuth();
   const { user } = post;
+  const { liked, toggleLike } = useRealtimeLike(post._id, authUser?.id);
   const [modalOpen, setModalOpen] = useState(false);
   const [sharesOpen, setSharesOpen] = useState(false);
   const [captionExpanded, setCaptionExpanded] = useState(false);
+
+  const toggleSave = async () => {
+    if (!authUser) return;
+    const { data: existing } = await supabase
+      .from('saved_posts')
+      .select('id')
+      .eq('user_id', authUser.id)
+      .eq('post_id', post._id)
+      .maybeSingle();
+    if (existing) {
+      await supabase.from('saved_posts').delete().eq('id', existing.id);
+    } else {
+      await supabase.from('saved_posts').insert({
+        user_id: authUser.id,
+        post_id: post._id,
+      });
+    }
+  };
 
   return (
     <>
@@ -72,7 +95,7 @@ const Post: React.FC<IProps> = ({ post }) => {
             anchor="bottom end"
             className="z-50 mt-1 w-72 overflow-hidden rounded-xl bg-white shadow-[0_4px_24px_rgba(0,0,0,0.18)] focus:outline-none dark:bg-neutral-800 dark:shadow-[0_4px_24px_rgba(0,0,0,0.5)] sm:w-80"
           >
-            <div className="fb-scrollbar max-h-[80vh] overflow-y-auto py-1">
+            <div className="hub-scrollbar max-h-[80vh] overflow-y-auto py-1">
               {menuGroups.map((group, gi) => (
                 <div key={gi}>
                   {gi > 0 && (
@@ -82,6 +105,11 @@ const Post: React.FC<IProps> = ({ post }) => {
                     <MenuItem key={item.label}>
                       {({ focus }) => (
                         <button
+                          onClick={() => {
+                            if (item.label === 'Enregistrer le post') {
+                              void toggleSave();
+                            }
+                          }}
                           className={`flex w-full items-start gap-3 px-3 py-2 text-left ${
                             focus
                               ? 'bg-gray-100 dark:bg-neutral-700'
@@ -128,7 +156,7 @@ const Post: React.FC<IProps> = ({ post }) => {
               onClick={() => setCaptionExpanded((v) => !v)}
               className="text-sm font-semibold text-gray-500 hover:underline dark:text-gray-400"
             >
-              {captionExpanded ? 'See less' : 'See more'}
+              {captionExpanded ? 'Voir moins' : 'Voir plus'}
             </button>
           )}
         </div>
@@ -162,31 +190,36 @@ const Post: React.FC<IProps> = ({ post }) => {
               onClick={() => setModalOpen(true)}
               className="text-gray-500 hover:underline dark:text-gray-300"
             >
-              {post.comments} Comments
+              {post.comments} commentaires
             </button>
             <button
               onClick={() => setSharesOpen(true)}
               className="text-gray-500 hover:underline dark:text-gray-300"
             >
-              {post.shares} Shares
+              {post.shares} partages
             </button>
           </div>
         </div>
         <div className="flex space-x-3 text-sm font-thin text-gray-500">
-          <button className="flex h-8 flex-1 items-center justify-center space-x-2 rounded-md hover:bg-gray-100 focus:bg-gray-200 focus:outline-none dark:text-gray-300 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700">
-            <i className="fas fa-thumbs-up"></i>
-            <p className="font-semibold">Like</p>
+          <button
+            onClick={() => void toggleLike()}
+            className={`flex h-8 flex-1 items-center justify-center space-x-2 rounded-md hover:bg-gray-100 focus:bg-gray-200 focus:outline-none dark:text-gray-300 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700 ${
+              liked ? 'text-primary' : ''
+            }`}
+          >
+            <i className={liked ? 'fas fa-thumbs-up' : 'far fa-thumbs-up'}></i>
+            <p className="font-semibold">J’aime</p>
           </button>
           <button
             onClick={() => setModalOpen(true)}
             className="flex h-8 flex-1 items-center justify-center space-x-2 rounded-md hover:bg-gray-100 focus:bg-gray-200 focus:outline-none dark:text-gray-300 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
           >
             <i className="fas fa-comment"></i>
-            <p className="font-semibold">Comment</p>
+            <p className="font-semibold">Commenter</p>
           </button>
           <button className="flex h-8 flex-1 items-center justify-center space-x-2 rounded-md hover:bg-gray-100 focus:bg-gray-200 focus:outline-none dark:text-gray-300 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700">
             <i className="fas fa-share"></i>
-            <p className="font-semibold">Share</p>
+            <p className="font-semibold">Partager</p>
           </button>
         </div>
       </div>

@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { storiesData } from '../../../lib/data';
+import { useRealtimeNews } from '../../../hooks/useRealtime';
 import Story from './Story';
 
 const SCROLL_AMOUNT = 240;
 
 const StoryList: React.FC = () => {
+  const news = useRealtimeNews();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -64,13 +65,13 @@ const StoryList: React.FC = () => {
           </div>
           <div className="absolute bottom-0 z-30 w-full rounded-b-xl bg-white p-2 pt-4 text-center dark:bg-neutral-800">
             <p className="text-xs font-semibold text-gray-500 dark:text-gray-200">
-              Create Story
+              Créer une actu
             </p>
           </div>
         </div>
 
-        {storiesData.map((story) => (
-          <Story key={story._id} story={story} />
+        {news.map((item) => (
+          <Story key={item.id} news={item} />
         ))}
       </div>
 

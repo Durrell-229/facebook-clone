@@ -1,0 +1,3 @@
+Déposez ici vos images fournies :
+- `landing-bg.jpg` — image de fond de la landing page
+- `icon.png` — icône du projet (favicon + logo, idéalement carré 512x512)

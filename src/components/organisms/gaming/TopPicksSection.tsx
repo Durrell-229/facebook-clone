@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { topPicksData } from '../../../lib/data';
+import { useRealtimeChallenges } from '../../../hooks/useRealtime';
 import GameCard from './GameCard';
 
 const SCROLL_AMOUNT = 600;
 
 const TopPicksSection: React.FC = () => {
+  const { challenges } = useRealtimeChallenges();
+  const featured = challenges.slice(0, 8);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -37,7 +39,7 @@ const TopPicksSection: React.FC = () => {
   return (
     <section className="mb-8">
       <h2 className="mb-3 text-lg font-bold text-gray-900 md:text-xl dark:text-white">
-        Top picks for you
+        Défis en vedette
       </h2>
       <div className="relative">
         {canScrollLeft && (
@@ -51,8 +53,8 @@ const TopPicksSection: React.FC = () => {
 
         <div ref={scrollRef} className="scrollbar-hide overflow-x-auto">
           <div className="grid grid-flow-col grid-rows-1 gap-2 pb-1 md:grid-rows-2">
-            {topPicksData.map((game) => (
-              <GameCard key={game._id} game={game} />
+            {featured.map((game) => (
+              <GameCard key={game._id} challenge={game} />
             ))}
           </div>
         </div>

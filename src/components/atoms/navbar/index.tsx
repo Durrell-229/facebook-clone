@@ -1,15 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
+import { useAuth } from '../../../context/AuthContext';
+import { useRealtimeNotifications } from '../../../hooks/useRealtime';
 import MessengerDropdown from './MessengerDropdown';
 
 const Navbar: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, profile, signOut } = useAuth();
+  const { unread, markAllRead } = useRealtimeNotifications(user?.id);
   const pathName = location?.pathname.split('/')[1];
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showMessenger, setShowMessenger] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const messengerRef = useRef<HTMLDivElement>(null);
+  const notificationsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -25,27 +32,38 @@ const Navbar: React.FC = () => {
       ) {
         setShowMessenger(false);
       }
+      if (
+        notificationsRef.current &&
+        !notificationsRef.current.contains(e.target as Node)
+      ) {
+        setShowNotifications(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
   return (
-    <div className="fixed z-50 flex h-14 w-full items-center justify-between gap-2 border-b bg-white px-2 shadow-sm dark:border-neutral-700 dark:bg-[#242526]">
+    <div className="fixed z-50 flex h-14 w-full items-center justify-between gap-2 border-b bg-white px-2 shadow-sm dark:border-neutral-700 dark:bg-[#0f1b2d]">
       <div className="flex min-w-0 items-center gap-2">
-        <div className="h-10 flex-shrink-0 text-primary">
-          <Link to="/">
-            <i className="fab fa-facebook text-[2.5rem]"></i>
+        <div className="flex h-10 flex-shrink-0 items-center gap-1.5">
+          <Link to="/feed" className="flex items-center gap-1.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-primary to-hub-cyan text-lg text-white">
+              <i className="fas fa-code"></i>
+            </div>
+            <span className="hidden text-[1.15rem] font-bold tracking-tight text-primary lg:block dark:text-white">
+              SyntaxHub
+            </span>
           </Link>
         </div>
         <div className="hidden h-10 sm:block">
           <input
-            placeholder="Search Facebook"
+            placeholder="Rechercher sur SyntaxHub"
             className="ml-2 h-full rounded-full bg-gray-100 px-3 pr-4 placeholder:text-neutral-400 focus:outline-none dark:bg-neutral-700 dark:placeholder:text-gray-400"
           />
         </div>
       </div>
       <div className="hidden flex-1 items-center justify-center space-x-1 md:flex">
-        <Link to="/" id="home">
+        <Link to="/feed" id="home">
           <div className="flex h-12 w-16 cursor-pointer items-center justify-center rounded-lg hover:bg-gray-100 lg:w-24 dark:hover:bg-neutral-700">
             <div className="relative flex h-auto w-14 items-center justify-center">
               <div
@@ -70,13 +88,13 @@ const Navbar: React.FC = () => {
             </div>
           </div>
         </Link>
-        <Tooltip place="bottom" anchorSelect="#home" content="Home" />
-        <Link to="/reel" id="reel">
+        <Tooltip place="bottom" anchorSelect="#home" content="Accueil" />
+        <Link to="/shorts" id="reel">
           <div className="flex h-12 w-16 cursor-pointer items-center justify-center rounded-lg hover:bg-gray-100 lg:w-24 dark:hover:bg-neutral-700">
             <div className="relative flex h-auto w-14 items-center justify-center">
               <div
                 className={`${
-                  pathName === 'reel' ? 'text-primary' : 'text-gray-400'
+                  pathName === 'shorts' ? 'text-primary' : 'text-gray-400'
                 }`}
               >
                 <svg
@@ -88,19 +106,19 @@ const Navbar: React.FC = () => {
                   style={{ color: 'var(--secondary-icon)' }}
                 >
                   <path d="M10.996 8.132A1 1 0 0 0 9.5 9v4a1 1 0 0 0 1.496.868l3.5-2a1 1 0 0 0 0-1.736l-3.5-2z"></path>
-                  <path d="M14.573 2H9.427c-1.824 0-3.293 0-4.45.155-1.2.162-2.21.507-3.013 1.31C1.162 4.266.817 5.277.655 6.477.5 7.634.5 9.103.5 10.927v.146c0 1.824 0 3.293.155 4.45.162 1.2.507 2.21 1.31 3.012.802.803 1.813 1.148 3.013 1.31C6.134 20 7.603 20 9.427 20h5.146c1.824 0 3.293 0 4.45-.155 1.2-.162 2.21-.507 3.012-1.31.803-.802 1.148-1.813 1.31-3.013.155-1.156.155-2.625.155-4.449v-.146c0-1.824 0-3.293-.155-4.45-.162-1.2-.507-2.21-1.31-3.013-.802-.802-1.813-1.147-3.013-1.309C17.866 2 16.397 2 14.573 2zM3.38 4.879c.369-.37.887-.61 1.865-.741C6.251 4.002 7.586 4 9.5 4h5c1.914 0 3.249.002 4.256.138.978.131 1.496.372 1.865.74.37.37.61.888.742 1.866.135 1.007.137 2.342.137 4.256 0 1.914-.002 3.249-.137 4.256-.132.978-.373 1.496-.742 1.865-.369.37-.887.61-1.865.742-1.007.135-2.342.137-4.256.137h-5c-1.914 0-3.249-.002-4.256-.137-.978-.132-1.496-.373-1.865-.742-.37-.369-.61-.887-.741-1.865C2.502 14.249 2.5 12.914 2.5 11c0-1.914.002-3.249.138-4.256.131-.978.372-1.496.74-1.865zM8 21.5a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8z"></path>
+                  <path d="M14.573 2H9.427c-1.824 0-3.293 0-4.45.155-1.2.162-2.21.507-3.013 1.31C1.162 4.266.817 5.277.655 6.477.5 7.634.5 9.103.5 10.927v.146c0 1.824 0 3.293.155 4.45.162 1.2.507 2.21 1.31 3.012.802.803 1.813 1.148 3.013 1.31C6.134 20 7.603 20 9.427 20h5.146c1.824 0 3.293 0 4.45-.155 1.2-.162 2.21-.507 3.012-.803.802-1.148 1.813-1.31 3.013-.155 1.156-.155 2.625-.155 4.449v-.146c0-1.824 0-3.293-.155-4.45-.162-1.2-.507-2.21-1.31-3.013-.802-.802-1.813-1.147-3.013-1.309C17.866 2 16.397 2 14.573 2zM3.38 4.879c.369-.37.887-.61 1.865-.741C6.251 4.002 7.586 4 9.5 4h5c1.914 0 3.249.002 4.256.138.978.131 1.496.372 1.865.74.37.37.61.888.742 1.866.135 1.007.137 2.342.137 4.256 0 1.914-.002 3.249-.137 4.256-.132.978-.373 1.496-.742 1.865-.369.37-.887.61-1.865.742-1.007.135-2.342.137-4.256.137h-5c-1.914 0-3.249-.002-4.256-.137-.978-.132-1.496-.373-1.865-.742-.37-.369-.61-.887-.741-1.865C2.502 14.249 2.5 12.914 2.5 11c0-1.914.002-3.249.138-4.256.131-.978.372-1.496.74-1.865zM8 21.5a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2H8z"></path>
                 </svg>
               </div>
             </div>
           </div>
         </Link>
-        <Tooltip place="bottom" anchorSelect="#reel" content="Reels" />
-        <Link to="/marketplace" id="marketplace">
+        <Tooltip place="bottom" anchorSelect="#reel" content="Shorts" />
+        <Link to="/jobs" id="marketplace">
           <div className="flex h-12 w-16 cursor-pointer items-center justify-center rounded-lg hover:bg-gray-100 lg:w-24 dark:hover:bg-neutral-700">
             <div className="relative flex h-auto w-14 items-center justify-center">
               <div
                 className={`${
-                  pathName === 'marketplace' ? 'text-primary' : 'text-gray-400'
+                  pathName === 'jobs' ? 'text-primary' : 'text-gray-400'
                 }`}
               >
                 <svg
@@ -120,14 +138,14 @@ const Navbar: React.FC = () => {
         <Tooltip
           place="bottom"
           anchorSelect="#marketplace"
-          content="Marketplace"
+          content="Emplois & Projets"
         />
-        <Link to="/group" id="group">
+        <Link to="/communities" id="group">
           <div className="flex h-12 w-16 cursor-pointer items-center justify-center rounded-lg hover:bg-gray-100 lg:w-24 dark:hover:bg-neutral-700">
             <div className="relative flex h-auto w-14 items-center justify-center">
               <div
                 className={`${
-                  pathName === 'group' ? 'text-primary' : 'text-gray-400'
+                  pathName === 'communities' ? 'text-primary' : 'text-gray-400'
                 }`}
               >
                 <svg
@@ -145,13 +163,13 @@ const Navbar: React.FC = () => {
             </div>
           </div>
         </Link>
-        <Tooltip place="bottom" anchorSelect="#group" content="Group" />
-        <Link to="/gaming" id="gaming">
+        <Tooltip place="bottom" anchorSelect="#group" content="Communautés" />
+        <Link to="/challenges" id="gaming">
           <div className="flex h-12 w-16 cursor-pointer items-center justify-center rounded-lg hover:bg-gray-100 lg:w-24 dark:hover:bg-neutral-700">
             <div className="relative flex h-auto w-14 items-center justify-center">
               <div
                 className={`${
-                  pathName === 'gaming' ? 'text-primary' : 'text-gray-400'
+                  pathName === 'challenges' ? 'text-primary' : 'text-gray-400'
                 }`}
               >
                 <svg
@@ -169,7 +187,7 @@ const Navbar: React.FC = () => {
             </div>
           </div>
         </Link>
-        <Tooltip place="bottom" anchorSelect="#gaming" content="Gaming" />
+        <Tooltip place="bottom" anchorSelect="#gaming" content="Défis" />
       </div>
       <div className="flex flex-shrink-0 items-center space-x-1">
         <button className="hidden h-10 w-10 rounded-full bg-gray-200 hover:bg-neutral-600 focus:outline-none sm:block dark:bg-neutral-700 dark:text-gray-200">
@@ -183,52 +201,81 @@ const Navbar: React.FC = () => {
             }}
             className="h-10 w-10 rounded-full bg-gray-200 hover:bg-neutral-600 focus:outline-none dark:bg-neutral-700 dark:text-gray-200"
           >
-            <i className="fab fa-facebook-messenger"></i>
+            <i className="fas fa-comments"></i>
           </button>
           {showMessenger && <MessengerDropdown />}
         </div>
-        <button className="h-10 w-10 rounded-full bg-gray-200 hover:bg-neutral-600 focus:outline-none dark:bg-neutral-700 dark:text-gray-200">
-          <i className="fas fa-bell"></i>
-        </button>
+        <div className="relative" ref={notificationsRef}>
+          <button
+            onClick={() => {
+              setShowNotifications((prev) => !prev);
+              setShowProfileMenu(false);
+              setShowMessenger(false);
+              if (!showNotifications) void markAllRead();
+            }}
+            className="relative h-10 w-10 rounded-full bg-gray-200 hover:bg-neutral-600 focus:outline-none dark:bg-neutral-700 dark:text-gray-200"
+          >
+            <i className="fas fa-bell"></i>
+            {unread > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                {unread}
+              </span>
+            )}
+          </button>
+          {showNotifications && (
+            <div className="absolute right-0 top-12 w-[380px] rounded-2xl bg-white p-3 shadow-2xl dark:bg-[#0f1b2d] dark:shadow-black/60">
+              <p className="mb-2 text-xl font-bold text-black dark:text-white">
+                Notifications
+              </p>
+              <div className="hub-scrollbar max-h-[60vh] overflow-y-auto">
+                <p className="rounded-lg bg-gray-100 px-3 py-4 text-center text-sm text-gray-500 dark:bg-[#1a2740] dark:text-gray-400">
+                  {unread > 0
+                    ? 'Nouvelles notifications'
+                    : 'Aucune nouvelle notification'}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
         <div className="relative" ref={profileMenuRef}>
           <button
             onClick={() => setShowProfileMenu((prev) => !prev)}
             className="relative flex h-10 items-center justify-center space-x-1 rounded-full text-black hover:bg-gray-300 focus:outline-none dark:text-gray-200 dark:hover:bg-neutral-700"
           >
             <img
-              src="https://random.imagecdn.app/200/200"
-              className="h-10 w-10 rounded-full hover:brightness-95 dark:hover:brightness-110"
+              src={profile?.avatar_url ?? 'https://random.imagecdn.app/200/200'}
+              className="h-10 w-10 rounded-full object-cover hover:brightness-95 dark:hover:brightness-110"
               alt="dp"
             />
-            <div className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full border border-[#242526] bg-gray-200 text-[9px] text-black dark:bg-neutral-600 dark:text-white">
+            <div className="absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full border border-[#0f1b2d] bg-gray-200 text-[9px] text-black dark:bg-neutral-600 dark:text-white">
               <i className="fas fa-chevron-down"></i>
             </div>
           </button>
 
           {showProfileMenu && (
-            <div className="absolute right-0 top-12 w-[340px] rounded-2xl bg-white p-2 shadow-2xl dark:bg-[#242526] dark:shadow-black/60">
+            <div className="absolute right-0 top-12 w-[340px] rounded-2xl bg-white p-2 shadow-2xl dark:bg-[#0f1b2d] dark:shadow-black/60">
               {/* Profile row */}
               <Link
                 to="/profile"
                 onClick={() => setShowProfileMenu(false)}
-                className="flex items-center gap-3 rounded-xl p-2 hover:bg-gray-100 dark:hover:bg-[#3A3B3C]"
+                className="flex items-center gap-3 rounded-xl p-2 hover:bg-gray-100 dark:hover:bg-[#1a2740]"
               >
                 <img
-                  src="https://random.imagecdn.app/200/200"
-                  className="h-9 w-9 rounded-full"
+                  src={profile?.avatar_url ?? 'https://random.imagecdn.app/200/200'}
+                  className="h-9 w-9 rounded-full object-cover"
                   alt="dp"
                 />
                 <span className="font-semibold text-black dark:text-white">
-                  Saiful Islam Shihab
+                  {profile?.full_name ?? 'Développeur'}
                 </span>
               </Link>
 
               <hr className="my-2 border-gray-200 dark:border-neutral-600" />
 
               {/* See all profiles */}
-              <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-100 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-200 dark:bg-[#3A3B3C] dark:text-gray-300 dark:hover:bg-neutral-600">
+              <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-gray-100 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-200 dark:bg-[#1a2740] dark:text-gray-300 dark:hover:bg-neutral-600">
                 <i className="fas fa-user-circle text-base"></i>
-                <span>See all profiles</span>
+                <span>Voir tous les profils</span>
               </button>
 
               <hr className="my-2 border-gray-200 dark:border-neutral-600" />
@@ -237,31 +284,31 @@ const Navbar: React.FC = () => {
               {[
                 {
                   icon: 'fas fa-cog',
-                  label: 'Settings & privacy',
+                  label: 'Paramètres et confidentialité',
                   hasArrow: true,
                 },
                 {
                   icon: 'fas fa-question-circle',
-                  label: 'Help & support',
+                  label: "Aide et assistance",
                   hasArrow: true,
                 },
                 {
                   icon: 'fas fa-moon',
-                  label: 'Display & accessibility',
+                  label: 'Affichage et accessibilité',
                   hasArrow: true,
                 },
                 {
                   icon: 'fas fa-comment-alt',
-                  label: 'Give feedback',
+                  label: 'Envoyer un retour',
                   sub: 'CTRL B',
                   hasArrow: false,
                 },
               ].map(({ icon, label, sub, hasArrow }) => (
                 <button
                   key={label}
-                  className="flex w-full items-center gap-3 rounded-xl p-2 hover:bg-gray-100 dark:hover:bg-[#3A3B3C]"
+                  className="flex w-full items-center gap-3 rounded-xl p-2 hover:bg-gray-100 dark:hover:bg-[#1a2740]"
                 >
-                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gray-200 text-base dark:bg-[#3A3B3C] dark:text-white">
+                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gray-200 text-base dark:bg-[#1a2740] dark:text-white">
                     <i className={icon}></i>
                   </div>
                   <div className="flex flex-col items-start">
@@ -280,19 +327,27 @@ const Navbar: React.FC = () => {
                 </button>
               ))}
 
-              <button className="flex w-full items-center gap-3 rounded-xl p-2 hover:bg-gray-100 dark:hover:bg-[#3A3B3C]">
-                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gray-200 text-base dark:bg-[#3A3B3C] dark:text-white">
+              <button
+                onClick={async () => {
+                  await signOut();
+                  setShowProfileMenu(false);
+                  navigate('/login');
+                }}
+                className="flex w-full items-center gap-3 rounded-xl p-2 hover:bg-gray-100 dark:hover:bg-[#1a2740]"
+              >
+                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gray-200 text-base dark:bg-[#1a2740] dark:text-white">
                   <i className="fas fa-sign-out-alt"></i>
                 </div>
                 <span className="text-[15px] font-medium text-black dark:text-white">
-                  Log out
+                  Se déconnecter
                 </span>
               </button>
 
               <hr className="my-2 border-gray-200 dark:border-neutral-600" />
 
               <p className="px-2 pb-1 text-center text-[11px] text-gray-400">
-                Privacy · Terms · Advertising · Ad Choices ▷ · Cookies · More
+                Confidentialité · Conditions · Code de conduite · Cookies ·
+                Plus
               </p>
             </div>
           )}

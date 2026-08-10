@@ -1,4 +1,4 @@
-export interface IReel {
+export interface IShort {
   _id: string;
   user: {
     _id: string;

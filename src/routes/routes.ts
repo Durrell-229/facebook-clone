@@ -1,9 +1,10 @@
-export const HOME = '/';
+export const LANDING = '/';
+export const FEED = '/feed';
 export const LOGIN = '/login';
 export const REGISTER = '/register';
-export const REEL = '/reel';
-export const MARKETPLACE = '/marketplace';
-export const GROUP = '/group';
-export const GAMING = '/gaming';
+export const SHORTS = '/shorts';
+export const JOBS = '/jobs';
+export const COMMUNITIES = '/communities';
+export const CHALLENGES = '/challenges';
 export const PROFILE = '/profile';
-export const STORIES = '/stories/:id';
+export const NEWS = '/news/:id';

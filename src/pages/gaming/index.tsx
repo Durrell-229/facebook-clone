@@ -8,7 +8,7 @@ const GamingPage: React.FC = () => {
   return (
     <div className="flex h-[calc(100vh-56px)]">
       <GamingLeftSidebar />
-      <main className="fb-scrollbar flex-1 overflow-y-auto bg-gray-100 px-3 py-4 dark:bg-neutral-900 md:px-4 md:py-5 lg:px-6">
+      <main className="hub-scrollbar flex-1 overflow-y-auto bg-gray-100 px-3 py-4 dark:bg-neutral-900 md:px-4 md:py-5 lg:px-6">
         <TopPicksSection />
         <HappeningNowSection />
         <MostPlayedSection />

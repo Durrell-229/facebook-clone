@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { groupsData } from '../../../lib/data';
+import { useRealtimeCommunities } from '../../../hooks/useRealtime';
 
 interface Props {
   isMobileOpen?: boolean;
@@ -7,18 +7,19 @@ interface Props {
 }
 
 const navItems = [
-  { icon: 'fas fa-rss', label: 'Your feed', active: true },
-  { icon: 'fas fa-compass', label: 'Discover' },
-  { icon: 'fas fa-users', label: 'Your groups' },
+  { icon: 'fas fa-rss', label: 'Votre fil', active: true },
+  { icon: 'fas fa-compass', label: 'Découvrir' },
+  { icon: 'fas fa-users', label: 'Vos communautés' },
 ];
 
 const GroupLeftSidebar: React.FC<Props> = ({
   isMobileOpen = false,
   onMobileClose,
 }) => {
+  const { communities } = useRealtimeCommunities();
   const [search, setSearch] = useState('');
 
-  const filtered = groupsData.filter((g) =>
+  const filtered = communities.filter((g) =>
     g.name.toLowerCase().includes(search.toLowerCase()),
   );
 
@@ -38,7 +39,7 @@ const GroupLeftSidebar: React.FC<Props> = ({
         {/* Header */}
         <div className="mb-3 flex items-center justify-between px-1">
           <h1 className="text-2xl font-bold text-black dark:text-white">
-            Groups
+            Communautés
           </h1>
           <div className="flex items-center gap-2">
             <button className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 dark:bg-neutral-700 dark:text-white dark:hover:bg-neutral-600">
@@ -59,7 +60,7 @@ const GroupLeftSidebar: React.FC<Props> = ({
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search groups"
+            placeholder="Rechercher des communautés"
             className="w-full rounded-full bg-gray-100 py-2 pl-9 pr-4 text-sm focus:outline-none dark:bg-neutral-700 dark:text-white dark:placeholder:text-gray-400"
           />
         </div>
@@ -105,7 +106,7 @@ const GroupLeftSidebar: React.FC<Props> = ({
         {/* Create new group */}
         <button className="mb-4 flex w-full items-center justify-center space-x-2 rounded-lg bg-blue-100 py-2 font-semibold text-primary hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-900/50">
           <i className="fas fa-plus text-sm"></i>
-          <span className="text-sm">Create new group</span>
+          <span className="text-sm">Créer une communauté</span>
         </button>
 
         <hr className="mb-3 border-gray-200 dark:border-neutral-700" />
@@ -113,10 +114,10 @@ const GroupLeftSidebar: React.FC<Props> = ({
         {/* Groups you've joined */}
         <div className="mb-2 flex items-center justify-between px-1">
           <span className="text-base font-bold text-black dark:text-white">
-            Groups you've joined
+            Communautés auxquelles vous avez adhéré
           </span>
           <button className="text-sm font-semibold text-primary hover:underline">
-            See all
+            Voir tout
           </button>
         </div>
 
@@ -137,12 +138,9 @@ const GroupLeftSidebar: React.FC<Props> = ({
                   {group.name}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {group.lastActive}
+                  {group.members.toLocaleString('fr-FR')} membres
                 </p>
               </div>
-              {group.isPinned && (
-                <i className="fas fa-thumbtack text-xs text-gray-400 dark:text-gray-500"></i>
-              )}
             </li>
           ))}
         </ul>

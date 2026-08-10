@@ -23,15 +23,15 @@ interface IMenuAction {
 
 const menuGroups: IMenuAction[][] = [
   [
-    { icon: 'fas fa-bookmark', label: 'Save post', description: 'Add this to your saved items.' },
+    { icon: 'fas fa-bookmark', label: 'Enregistrer le post', description: 'Ajouter à vos éléments enregistrés.' },
   ],
   [
-    { icon: 'fas fa-bell', label: 'Turn on notifications for this post' },
-    { icon: 'fas fa-info-circle', label: 'Why am I seeing this post?' },
+    { icon: 'fas fa-bell', label: 'Activer les notifications pour ce post' },
+    { icon: 'fas fa-info-circle', label: 'Pourquoi voir ce post ?' },
   ],
   [
-    { icon: 'fas fa-times-circle', iconColor: 'text-red-500', label: 'Hide post', description: 'See fewer posts like this.' },
-    { icon: 'fas fa-exclamation-circle', iconColor: 'text-red-500', label: 'Report post', description: "We won't let them know who reported this." },
+    { icon: 'fas fa-times-circle', iconColor: 'text-red-500', label: 'Masquer le post', description: 'Voir moins de posts de ce type.' },
+    { icon: 'fas fa-exclamation-circle', iconColor: 'text-red-500', label: 'Signaler le post', description: "Nous ne les informerons pas de ce signalement." },
   ],
 ];
 
@@ -93,7 +93,7 @@ const GroupPost: React.FC<IProps> = ({ post }) => {
             anchor="bottom end"
             className="z-50 mt-1 w-72 overflow-hidden rounded-xl bg-white shadow-[0_4px_24px_rgba(0,0,0,0.18)] focus:outline-none dark:bg-neutral-800 dark:shadow-[0_4px_24px_rgba(0,0,0,0.5)]"
           >
-            <div className="fb-scrollbar max-h-[80vh] overflow-y-auto py-1">
+            <div className="hub-scrollbar max-h-[80vh] overflow-y-auto py-1">
               {menuGroups.map((group, gi) => (
                 <div key={gi}>
                   {gi > 0 && (
@@ -145,7 +145,7 @@ const GroupPost: React.FC<IProps> = ({ post }) => {
             onClick={() => setExpanded((v) => !v)}
             className="text-sm font-semibold text-gray-500 hover:underline dark:text-gray-400"
           >
-            {expanded ? 'See less' : 'See more'}
+            {expanded ? 'Voir moins' : 'Voir plus'}
           </button>
         )}
       </div>
@@ -166,9 +166,9 @@ const GroupPost: React.FC<IProps> = ({ post }) => {
           <span className="text-gray-500 dark:text-gray-400">{post.likes}</span>
         </div>
         <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400">
-          <button className="hover:underline">{post.commentsCount} comments</button>
+          <button className="hover:underline">{post.commentsCount} commentaires</button>
           {post.sharesCount > 0 && (
-            <button className="hover:underline">{post.sharesCount} shares</button>
+            <button className="hover:underline">{post.sharesCount} partages</button>
           )}
         </div>
       </div>
@@ -176,9 +176,9 @@ const GroupPost: React.FC<IProps> = ({ post }) => {
       {/* Action buttons */}
       <div className="flex border-b border-gray-200 dark:border-neutral-700">
         {[
-          { icon: 'fas fa-thumbs-up', label: 'Like' },
-          { icon: 'fas fa-comment', label: 'Comment' },
-          { icon: 'fas fa-share', label: 'Share' },
+          { icon: 'fas fa-thumbs-up', label: 'J\'aime' },
+          { icon: 'fas fa-comment', label: 'Commenter' },
+          { icon: 'fas fa-share', label: 'Partager' },
         ].map((btn) => (
           <button
             key={btn.label}

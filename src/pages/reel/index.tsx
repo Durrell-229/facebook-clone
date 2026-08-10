@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { reelsData } from '../../lib/data';
+import { useRealtimeShorts } from '../../hooks/useRealtime';
 
 const fmt = (n: number) =>
   n >= 1_000_000
@@ -9,6 +9,7 @@ const fmt = (n: number) =>
       : `${n}`;
 
 const ReelPage: React.FC = () => {
+  const { shorts } = useRealtimeShorts();
   const [index, setIndex] = useState(0);
   const [liked, setLiked] = useState<Record<string, boolean>>({});
   const [muted, setMuted] = useState(true);
@@ -34,7 +35,7 @@ const ReelPage: React.FC = () => {
     v.muted = true;
     setPaused(false);
     setProgress(0);
-    const tryPlay = () => v.play().catch(() => {});
+    const tryPlay = () => v.play().catch(() => undefined);
     v.addEventListener('canplay', tryPlay, { once: true });
     v.load();
     return () => v.removeEventListener('canplay', tryPlay);
@@ -50,7 +51,7 @@ const ReelPage: React.FC = () => {
     const v = videoRef.current;
     if (!v) return;
     if (paused) v.pause();
-    else v.play().catch(() => {});
+    else v.play().catch(() => undefined);
   }, [paused]);
 
   const navigate = useCallback((dir: 'up' | 'down') => {
@@ -59,7 +60,7 @@ const ReelPage: React.FC = () => {
     const next =
       dir === 'up'
         ? Math.max(0, curr - 1)
-        : Math.min(reelsData.length - 1, curr + 1);
+        : Math.min(shorts.length - 1, curr + 1);
     if (next === curr) return;
 
     scrollLock.current = true;
@@ -71,7 +72,7 @@ const ReelPage: React.FC = () => {
     setTimeout(() => {
       scrollLock.current = false;
     }, 800);
-  }, []);
+  }, [shorts.length]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -84,7 +85,7 @@ const ReelPage: React.FC = () => {
     return () => el.removeEventListener('wheel', handler);
   }, [navigate]);
 
-  const reel = reelsData[index];
+  const reel = shorts[index];
   const isLiked = !!liked[reel._id];
 
   return (
@@ -167,7 +168,7 @@ const ReelPage: React.FC = () => {
               )}
               <span className="text-white/50">·</span>
               <button className="rounded border border-white px-2.5 py-0.5 text-xs font-semibold text-white hover:bg-white/10 focus:outline-none">
-                {reel.user.isFollowing ? 'Following' : 'Follow'}
+                {reel.user.isFollowing ? 'Abonné' : 'Suivre'}
               </button>
             </div>
             <div className="flex items-center gap-1.5">
@@ -239,7 +240,7 @@ const ReelPage: React.FC = () => {
         </button>
         <button
           onClick={() => navigate('down')}
-          disabled={index === reelsData.length - 1}
+          disabled={index === shorts.length - 1}
           className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none disabled:opacity-25"
         >
           <i className="fas fa-chevron-down text-sm"></i>

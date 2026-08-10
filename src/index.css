@@ -12,43 +12,67 @@
 
 /* Reusable thin scrollbar utility */
 @layer utilities {
-  .fb-scrollbar {
+  .hub-scrollbar {
     scrollbar-width: thin;
     scrollbar-color: #d1d5db transparent;
   }
-  .fb-scrollbar::-webkit-scrollbar {
+  .hub-scrollbar::-webkit-scrollbar {
     width: 4px;
   }
-  .fb-scrollbar::-webkit-scrollbar-track {
+  .hub-scrollbar::-webkit-scrollbar-track {
     background: transparent;
   }
-  .fb-scrollbar::-webkit-scrollbar-thumb {
+  .hub-scrollbar::-webkit-scrollbar-thumb {
     background-color: #d1d5db;
     border-radius: 9999px;
   }
-  .fb-scrollbar::-webkit-scrollbar-thumb:hover {
+  .hub-scrollbar::-webkit-scrollbar-thumb:hover {
     background-color: #9ca3af;
   }
 }
 
 @media (prefers-color-scheme: dark) {
-  .fb-scrollbar {
+  .hub-scrollbar {
     scrollbar-color: #525252 transparent;
   }
-  .fb-scrollbar::-webkit-scrollbar-thumb {
+  .hub-scrollbar::-webkit-scrollbar-thumb {
     background-color: #525252;
   }
-  .fb-scrollbar::-webkit-scrollbar-thumb:hover {
+  .hub-scrollbar::-webkit-scrollbar-thumb:hover {
     background-color: #737373;
   }
 }
 
-.dark .fb-scrollbar {
+.dark .hub-scrollbar {
   scrollbar-color: #525252 transparent;
 }
-.dark .fb-scrollbar::-webkit-scrollbar-thumb {
+.dark .hub-scrollbar::-webkit-scrollbar-thumb {
   background-color: #525252;
 }
-.dark .fb-scrollbar::-webkit-scrollbar-thumb:hover {
+.dark .hub-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: #737373;
+}
+
+/* ---- Syntax AI ---- */
+.ai-code {
+  display: block;
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  background: #0b1220;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.625rem 0.75rem;
+  margin: 0.4rem 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: #a5f3fc;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.ai-inline {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  background: rgba(99, 102, 241, 0.15);
+  border-radius: 4px;
+  padding: 0.1rem 0.3rem;
+  color: #c7d2fe;
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import ExternalFeedSection from '../../components/organisms/newsfeed/ExternalFeedSection';
 import StoryList from '../../components/organisms/newsfeed/StoryList';
 import CreatePostBox from '../../components/organisms/post/CreatePostBox';
 import PostContainer from '../../components/organisms/post/PostContainer';
@@ -10,6 +11,7 @@ const NewsFeedPage: React.FC = () => {
         <StoryList />
         <CreatePostBox />
         <PostContainer />
+        <ExternalFeedSection />
       </div>
     </div>
   );

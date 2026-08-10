@@ -1,41 +1,35 @@
 import React, { useState } from 'react';
 
 const navItems = [
-  { id: 'play', icon: 'fas fa-gamepad', label: 'Play games' },
-  { id: 'activity', icon: 'fas fa-chart-line', label: 'Gaming activity' },
+  { id: 'play', icon: 'fas fa-flag-checkered', label: 'Relever des défis' },
+  { id: 'activity', icon: 'fas fa-chart-line', label: 'Mon activité' },
   { id: 'notifications', icon: 'fas fa-bell', label: 'Notifications' },
 ];
 
 const categories = [
-  { label: 'All games', icon: 'fas fa-th' },
-  { label: 'Action', icon: 'fas fa-fist-raised' },
-  { label: 'Adventure', icon: 'fas fa-compass' },
-  { label: 'Arcade', icon: 'fas fa-gamepad' },
-  { label: 'Battle', icon: 'fas fa-shield-alt' },
-  { label: 'Board', icon: 'fas fa-chess-board' },
-  { label: 'Builder', icon: 'fas fa-hammer' },
-  { label: 'Card', icon: 'fas fa-clone' },
-  { label: 'Casino', icon: 'fas fa-dice' },
-  { label: 'Design', icon: 'fas fa-paint-brush' },
-  { label: 'Match', icon: 'fas fa-fire' },
-  { label: 'Merge', icon: 'fas fa-compress-arrows-alt' },
-  { label: 'Puzzle', icon: 'fas fa-puzzle-piece' },
-  { label: 'Racing', icon: 'fas fa-flag-checkered' },
-  { label: 'Strategy', icon: 'fas fa-chess' },
-  { label: 'Sports', icon: 'fas fa-football-ball' },
-  { label: 'Word', icon: 'fas fa-font' },
+  { label: 'Tous les défis', icon: 'fas fa-th' },
+  { label: 'Algorithmes', icon: 'fas fa-sort-amount-up' },
+  { label: 'Frontend', icon: 'fas fa-paint-brush' },
+  { label: 'Backend', icon: 'fas fa-server' },
+  { label: 'Fullstack', icon: 'fas fa-layer-group' },
+  { label: 'Cybersécurité', icon: 'fas fa-shield-alt' },
+  { label: 'Data & IA', icon: 'fas fa-brain' },
+  { label: 'DevOps', icon: 'fas fa-cloud' },
+  { label: 'Mobile', icon: 'fas fa-mobile-alt' },
+  { label: 'Open Source', icon: 'fas fa-code-branch' },
+  { label: 'Hackathon', icon: 'fas fa-rocket' },
 ];
 
 const GamingLeftSidebar: React.FC = () => {
   const [activeNav, setActiveNav] = useState('play');
-  const [activeCategory, setActiveCategory] = useState('All games');
+  const [activeCategory, setActiveCategory] = useState('Tous les défis');
 
   return (
-    <div className="fb-scrollbar sticky top-14 hidden h-[calc(100vh-56px)] shrink-0 overflow-y-auto border-r border-gray-200 py-4 dark:border-neutral-700 md:flex md:w-16 md:flex-col md:px-1.5 lg:w-72 lg:px-3 xl:w-[360px]">
+    <div className="hub-scrollbar sticky top-14 hidden h-[calc(100vh-56px)] shrink-0 overflow-y-auto border-r border-gray-200 py-4 dark:border-neutral-700 md:flex md:w-16 md:flex-col md:px-1.5 lg:w-72 lg:px-3 xl:w-[360px]">
 
       {/* Header — visible on lg+ only */}
       <div className="mb-4 hidden items-center justify-between px-2 lg:flex">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Games</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Défis</h1>
         <button className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 focus:outline-none dark:bg-neutral-700 dark:text-white dark:hover:bg-neutral-600">
           <i className="fas fa-cog text-sm"></i>
         </button>
@@ -45,7 +39,7 @@ const GamingLeftSidebar: React.FC = () => {
       <div className="relative mb-3 hidden lg:block">
         <i className="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 dark:text-gray-400"></i>
         <input
-          placeholder="Search games"
+          placeholder="Rechercher un défi"
           className="w-full rounded-full bg-gray-100 py-2 pl-9 pr-4 text-sm focus:outline-none dark:bg-neutral-700 dark:text-white dark:placeholder:text-gray-400"
         />
       </div>
@@ -88,20 +82,20 @@ const GamingLeftSidebar: React.FC = () => {
         ))}
       </ul>
 
-      {/* Your games — visible on lg+ only */}
+      {/* Your challenges — visible on lg+ only */}
       <div className="mb-3 hidden px-2 lg:block">
         <div className="mb-1 flex items-center justify-between">
-          <span className="text-sm font-semibold text-gray-900 dark:text-white">Your games</span>
-          <button className="text-sm font-semibold text-primary hover:underline">See all</button>
+          <span className="text-sm font-semibold text-gray-900 dark:text-white">Mes défis</span>
+          <button className="text-sm font-semibold text-primary hover:underline">Voir tout</button>
         </div>
         <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">
-          Save a game to your games to create a shortcut for it here.
+          Enregistrez un défi pour créer un raccourci ici.
         </p>
         <button className="flex w-full items-center space-x-3 rounded-lg px-2 py-2 hover:bg-gray-100 focus:outline-none dark:hover:bg-neutral-800">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-200 dark:bg-neutral-700">
             <i className="fas fa-bookmark text-sm text-gray-700 dark:text-gray-200"></i>
           </div>
-          <span className="text-sm font-semibold text-gray-900 dark:text-gray-200">Save games</span>
+          <span className="text-sm font-semibold text-gray-900 dark:text-gray-200">Enregistrer des défis</span>
         </button>
       </div>
 
@@ -110,7 +104,7 @@ const GamingLeftSidebar: React.FC = () => {
 
       {/* Categories */}
       <div className="lg:px-2">
-        <p className="mb-2 hidden text-sm font-bold text-gray-900 dark:text-white lg:block">Categories</p>
+        <p className="mb-2 hidden text-sm font-bold text-gray-900 dark:text-white lg:block">Catégories</p>
         <ul className="space-y-0.5">
           {categories.map((cat) => (
             <li key={cat.label}>

@@ -9,6 +9,7 @@ import ReelPageLayout from '../components/layouts/ReelPageLayout';
 import StoriesLayout from '../components/layouts/StoriesLayout';
 import GamingPage from '../pages/gaming';
 import GroupPage from '../pages/group';
+import LandingPage from '../pages/landing';
 import LoginPage from '../pages/login';
 import MarketplacePage from '../pages/marketplace';
 import NewsFeedPage from '../pages/newsfeed';
@@ -19,25 +20,27 @@ import ReelPage from '../pages/reel';
 import StoriesPage from '../pages/stories';
 import { PrivateRoute } from './PrivateRoute';
 import {
-  GAMING,
-  GROUP,
-  HOME,
+  CHALLENGES,
+  COMMUNITIES,
+  FEED,
+  JOBS,
+  LANDING,
   LOGIN,
-  MARKETPLACE,
+  NEWS,
   PROFILE,
-  REEL,
   REGISTER,
-  STORIES,
+  SHORTS,
 } from './routes';
 
 const Routers: React.FC = () => {
   return (
     <Routes>
+      <Route path={LANDING} element={<LandingPage />} />
       <Route path={LOGIN} element={<LoginPage />} />
       <Route path={REGISTER} element={<RegisterPage />} />
 
       <Route
-        path={HOME}
+        path={FEED}
         element={
           <PrivateRoute layout={NewsFeedLayout}>
             <NewsFeedPage />
@@ -46,7 +49,7 @@ const Routers: React.FC = () => {
       />
 
       <Route
-        path={REEL}
+        path={SHORTS}
         element={
           <PrivateRoute layout={ReelPageLayout}>
             <ReelPage />
@@ -55,7 +58,7 @@ const Routers: React.FC = () => {
       />
 
       <Route
-        path={MARKETPLACE}
+        path={JOBS}
         element={
           <PrivateRoute layout={MarketplacePageLayout}>
             <MarketplacePage />
@@ -64,7 +67,7 @@ const Routers: React.FC = () => {
       />
 
       <Route
-        path={GROUP}
+        path={COMMUNITIES}
         element={
           <PrivateRoute layout={GroupPageLayout}>
             <GroupPage />
@@ -73,7 +76,7 @@ const Routers: React.FC = () => {
       />
 
       <Route
-        path={GAMING}
+        path={CHALLENGES}
         element={
           <PrivateRoute layout={GamingPageLayout}>
             <GamingPage />
@@ -91,7 +94,7 @@ const Routers: React.FC = () => {
       />
 
       <Route
-        path={STORIES}
+        path={NEWS}
         element={
           <PrivateRoute layout={StoriesLayout}>
             <StoriesPage />

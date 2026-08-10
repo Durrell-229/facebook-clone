@@ -1,8 +1,8 @@
 import React from 'react';
-import { IMarketplaceListing } from '../../../types/marketplace';
+import { IJobListing } from '../../../types/job';
 
 interface Props {
-  listing: IMarketplaceListing;
+  listing: IJobListing;
   onClick?: () => void;
 }
 
@@ -17,8 +17,10 @@ const MarketplaceListingCard: React.FC<Props> = ({ listing, onClick }) => {
         />
       </div>
       <div className="p-1.5">
-        <p className="text-sm font-bold text-black dark:text-white">
-          {listing.isFree ? 'FREE' : `BDT${listing.price.toLocaleString()}`}
+        <p className="text-sm font-bold text-primary dark:text-hub-cyan">
+          {listing.isFree
+            ? 'OPEN SOURCE'
+            : `${listing.salary.toLocaleString('fr-FR')} €/an`}
         </p>
         <p className="line-clamp-2 text-sm leading-tight text-black dark:text-gray-200">
           {listing.title}

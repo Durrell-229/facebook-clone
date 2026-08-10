@@ -1,13 +1,13 @@
 {
-  "name": "facebook-ui-clone",
+  "name": "syntaxhub",
   "version": "0.1.0",
-  "description": "A pixel-perfect Facebook UI clone built with React 18, TypeScript, Vite, and Tailwind CSS. Includes Newsfeed, Marketplace, Groups, Gaming, Stories, Reels, and more.",
-  "author": "saifulshihab <saifulshihab29@gmail.com>",
+  "description": "SyntaxHub — le réseau social des développeurs. Fil d'actualité, emplois & projets, communautés, défis de code, shorts et actualités tech. Built with React 18, TypeScript, Vite, and Tailwind CSS.",
+  "author": "SyntaxHub",
   "license": "MIT",
-  "homepage": "https://github.com/saifulshihab/facebook-clone",
+  "homepage": "https://github.com/syntaxhub/syntaxhub",
   "repository": {
     "type": "git",
-    "url": "https://github.com/saifulshihab/facebook-clone.git"
+    "url": "https://github.com/syntaxhub/syntaxhub.git"
   },
   "bugs": {
     "url": "https://github.com/saifulshihab/facebook-clone/issues"
@@ -16,6 +16,7 @@
   "type": "module",
   "dependencies": {
     "@headlessui/react": "^2.2.10",
+    "@supabase/supabase-js": "^2.112.2",
     "clsx": "^2.1.0",
     "formik": "^2.2.9",
     "moment": "^2.29.2",
@@ -37,23 +38,21 @@
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|jsx|tsx|json)\""
   },
   "keywords": [
-    "facebook-clone",
-    "facebook-ui",
+    "syntaxhub",
+    "developer-social-network",
     "react",
     "react18",
     "typescript",
     "vite",
     "tailwindcss",
-    "social-media-clone",
     "social-network",
+    "programming",
+    "cybersecurity",
+    "web-development",
     "frontend",
-    "ui-clone",
-    "newsfeed",
-    "marketplace",
-    "groups",
-    "gaming",
-    "stories",
-    "reels",
+    "dev-community",
+    "challenges",
+    "shorts",
     "headlessui",
     "react-router"
   ],

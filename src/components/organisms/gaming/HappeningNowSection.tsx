@@ -1,19 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { gameEventsData } from '../../../lib/data';
-import { IGameEvent } from '../../../types/game';
+import { useRealtimeChallenges } from '../../../hooks/useRealtime';
+import { IChallengeEvent } from '../../../types/challenge';
 
 const SCROLL_AMOUNT = 600;
 
-const EventCard: React.FC<{ event: IGameEvent }> = ({ event }) => (
+const EventCard: React.FC<{ event: IChallengeEvent }> = ({ event }) => (
   <div className="relative w-40 flex-shrink-0 cursor-pointer overflow-hidden rounded-xl shadow transition-transform hover:scale-[1.02] md:w-48">
     <div className="absolute left-0 right-0 top-0 z-10 flex items-center space-x-1.5 bg-gradient-to-b from-black/70 to-transparent p-2">
       <img
-        src={event.gameIcon}
-        alt={event.gameTitle}
+        src={event.challengeIcon}
+        alt={event.challengeTitle}
         className="h-6 w-6 rounded-full object-cover"
       />
       <span className="truncate text-xs font-semibold text-white">
-        {event.gameTitle}
+        {event.challengeTitle}
       </span>
     </div>
 
@@ -24,8 +24,8 @@ const EventCard: React.FC<{ event: IGameEvent }> = ({ event }) => (
     />
 
     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-2.5 pt-8">
-      <p className="text-[10px] font-bold uppercase tracking-wide text-blue-400">
-        ENDS IN {event.endsInDays} DAYS
+      <p className="text-[10px] font-bold uppercase tracking-wide text-hub-cyan">
+        SE TERMINE DANS {event.endsInDays} JOURS
       </p>
       <p className="mt-0.5 text-sm font-bold leading-tight text-white">
         {event.title}
@@ -38,6 +38,7 @@ const EventCard: React.FC<{ event: IGameEvent }> = ({ event }) => (
 );
 
 const HappeningNowSection: React.FC = () => {
+  const { events } = useRealtimeChallenges();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -70,7 +71,7 @@ const HappeningNowSection: React.FC = () => {
   return (
     <section className="mb-8">
       <h2 className="mb-3 text-lg font-bold text-gray-900 md:text-xl dark:text-white">
-        Happening now
+        Compétitions & événements
       </h2>
       <div className="relative">
         {canScrollLeft && (
@@ -86,7 +87,7 @@ const HappeningNowSection: React.FC = () => {
           ref={scrollRef}
           className="scrollbar-hide flex space-x-3 overflow-x-auto pb-1"
         >
-          {gameEventsData.map((event) => (
+          {events.map((event) => (
             <EventCard key={event._id} event={event} />
           ))}
         </div>

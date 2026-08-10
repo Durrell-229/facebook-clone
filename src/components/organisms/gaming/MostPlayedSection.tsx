@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { mostPlayedData } from '../../../lib/data';
+import { useRealtimeChallenges } from '../../../hooks/useRealtime';
 import GameCard from './GameCard';
 
 const SCROLL_AMOUNT = 600;
 
 const MostPlayedSection: React.FC = () => {
+  const { challenges } = useRealtimeChallenges();
+  const trending = [...challenges].sort((a, b) => b.participantsCount - a.participantsCount).slice(0, 8);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -37,7 +39,7 @@ const MostPlayedSection: React.FC = () => {
   return (
     <section className="mb-8">
       <h2 className="mb-3 text-lg font-bold text-gray-900 md:text-xl dark:text-white">
-        Most played games
+        Défis tendance
       </h2>
       <div className="relative">
         {canScrollLeft && (
@@ -53,8 +55,8 @@ const MostPlayedSection: React.FC = () => {
           ref={scrollRef}
           className="scrollbar-hide flex space-x-3 overflow-x-auto pb-1"
         >
-          {mostPlayedData.map((game) => (
-            <GameCard key={game._id} game={game} size="lg" />
+          {trending.map((game) => (
+            <GameCard key={game._id} challenge={game} size="lg" />
           ))}
         </div>
 

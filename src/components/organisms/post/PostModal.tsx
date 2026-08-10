@@ -1,6 +1,9 @@
 import { Dialog, DialogPanel } from '@headlessui/react';
 import moment from 'moment';
 import React, { useState } from 'react';
+import { useAuth } from '../../../context/AuthContext';
+import { useRealtimeComments } from '../../../hooks/useRealtime';
+import { supabase } from '../../../lib/supabase';
 import { IComment, IPost } from '../../../types/post';
 
 interface IProps {
@@ -19,7 +22,7 @@ const CommentItem: React.FC<{ comment: IComment; isReply?: boolean }> = ({
     <div className={`flex gap-2 ${isReply ? 'ml-10 mt-2' : 'mt-4'}`}>
       <img
         src={comment.user.dp ?? 'https://random.imagecdn.app/200/200'}
-        className="h-8 w-8 flex-shrink-0 rounded-full"
+        className="h-8 w-8 flex-shrink-0 rounded-full object-cover"
         alt="dp"
       />
       <div className="flex flex-col">
@@ -41,8 +44,8 @@ const CommentItem: React.FC<{ comment: IComment; isReply?: boolean }> = ({
         </div>
         <div className="mt-2 flex items-center gap-3 text-xs font-semibold text-gray-500 dark:text-gray-400">
           <span>{moment(comment.createdAt).fromNow()}</span>
-          <button className="hover:underline">Like</button>
-          <button className="hover:underline">Reply</button>
+          <button className="hover:underline">J’aime</button>
+          <button className="hover:underline">Répondre</button>
         </div>
         {comment.replies && comment.replies.length > 0 && (
           <button
@@ -53,8 +56,10 @@ const CommentItem: React.FC<{ comment: IComment; isReply?: boolean }> = ({
               className={`fas fa-${showReplies ? 'chevron-up' : 'chevron-down'} text-[10px]`}
             ></i>
             {showReplies
-              ? 'Hide replies'
-              : `View all ${comment.replies.length} ${comment.replies.length === 1 ? 'reply' : 'replies'}`}
+              ? 'Masquer les réponses'
+              : `Voir les ${comment.replies.length} ${
+                  comment.replies.length === 1 ? 'réponse' : 'réponses'
+                }`}
           </button>
         )}
         {showReplies &&
@@ -68,17 +73,48 @@ const CommentItem: React.FC<{ comment: IComment; isReply?: boolean }> = ({
 
 const PostModal: React.FC<IProps> = ({ post, isOpen, onClose }) => {
   const { user } = post;
+  const { user: authUser, profile } = useAuth();
+  const { comments } = useRealtimeComments(post._id);
+  const [commentText, setCommentText] = useState('');
+
+  const commentsData: IComment[] = comments.map((c) => ({
+    _id: c.id,
+    user: {
+      _id: c.author?.id ?? c.author_id,
+      fullName: c.author?.full_name ?? 'Membre',
+      dp: c.author?.avatar_url ?? 'https://random.imagecdn.app/200/200',
+    },
+    text: c.content,
+    likes: c.likes_count,
+    reactions: [],
+    createdAt: new Date(c.created_at),
+  }));
+
+  const submitComment = async () => {
+    if (!authUser || !commentText.trim()) return;
+    const { error } = await supabase.from('comments').insert({
+      post_id: post._id,
+      author_id: authUser.id,
+      content: commentText.trim(),
+    });
+    if (!error) {
+      await supabase.rpc('increment_post_comments', { post_id: post._id, delta: 1 });
+      setCommentText('');
+    }
+  };
+
+  const firstName = profile?.full_name?.split(' ')[0] ?? 'développeur';
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
       <div className="fixed inset-0 bg-black/60" aria-hidden="true" />
 
       <div className="fixed inset-0 flex items-center justify-center p-2 sm:p-4">
-        <DialogPanel className="flex h-full max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-neutral-800">
+        <DialogPanel className="flex h-full max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-hub-surface">
           {/* Header */}
           <div className="relative flex flex-shrink-0 items-center justify-center border-b px-4 py-3 dark:border-neutral-700">
             <p className="text-base font-bold text-gray-900 dark:text-gray-100">
-              {user.fullName}&apos;s Post
+              Post de {user.fullName}
             </p>
             <button
               onClick={onClose}
@@ -89,12 +125,12 @@ const PostModal: React.FC<IProps> = ({ post, isOpen, onClose }) => {
           </div>
 
           {/* Scrollable body */}
-          <div className="fb-scrollbar min-h-0 flex-1 overflow-y-auto">
+          <div className="hub-scrollbar min-h-0 flex-1 overflow-y-auto">
             {/* Post header */}
             <div className="flex items-center gap-3 px-4 pt-4">
               <img
                 src={user.dp ?? 'https://random.imagecdn.app/200/200'}
-                className="h-10 w-10 rounded-full"
+                className="h-10 w-10 rounded-full object-cover"
                 alt="dp"
               />
               <div>
@@ -103,7 +139,7 @@ const PostModal: React.FC<IProps> = ({ post, isOpen, onClose }) => {
                 </p>
                 <p className="text-xs text-gray-400">
                   {moment(post.createdAt).fromNow()} ·{' '}
-                  <i className="fas fa-globe-asia"></i>
+                  <i className="fas fa-globe-americas"></i>
                 </p>
               </div>
             </div>
@@ -136,17 +172,17 @@ const PostModal: React.FC<IProps> = ({ post, isOpen, onClose }) => {
                 </span>
               </div>
               <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400">
-                <span>{post.comments} comments</span>
-                <span>{post.shares} shares</span>
+                <span>{post.comments} commentaires</span>
+                <span>{post.shares} partages</span>
               </div>
             </div>
 
             {/* Action buttons */}
             <div className="mx-2 flex gap-1 border-b py-1 dark:border-neutral-700">
               {[
-                'fas fa-thumbs-up|Like',
-                'fas fa-comment|Comment',
-                'fas fa-share|Share',
+                'fas fa-thumbs-up|J\'aime',
+                'fas fa-comment|Commenter',
+                'fas fa-share|Partager',
               ].map((item) => {
                 const [icon, label] = item.split('|');
                 return (
@@ -163,12 +199,12 @@ const PostModal: React.FC<IProps> = ({ post, isOpen, onClose }) => {
 
             {/* Comments */}
             <div className="px-4 pb-6">
-              {post.commentsData.length === 0 ? (
+              {commentsData.length === 0 ? (
                 <p className="mt-6 text-center text-sm text-gray-400">
-                  No comments yet. Be the first!
+                  Aucun commentaire pour l’instant. Soyez le premier !
                 </p>
               ) : (
-                post.commentsData.map((comment) => (
+                commentsData.map((comment) => (
                   <CommentItem key={comment._id} comment={comment} />
                 ))
               )}
@@ -179,31 +215,25 @@ const PostModal: React.FC<IProps> = ({ post, isOpen, onClose }) => {
           <div className="flex-shrink-0 border-t px-3 py-3 dark:border-neutral-700">
             <div className="flex items-center gap-2">
               <img
-                src="https://random.imagecdn.app/200/200"
-                className="h-8 w-8 flex-shrink-0 rounded-full"
+                src={profile?.avatar_url ?? 'https://random.imagecdn.app/200/200'}
+                className="h-8 w-8 flex-shrink-0 rounded-full object-cover"
                 alt="dp"
               />
               <div className="flex flex-1 items-center gap-2 rounded-full bg-gray-100 px-3 py-2 dark:bg-neutral-700">
-                <div className="flex gap-2 text-gray-400">
-                  <button className="hover:text-primary focus:outline-none">
-                    <i className="far fa-smile"></i>
-                  </button>
-                  <button className="hover:text-primary focus:outline-none">
-                    <i className="fas fa-image"></i>
-                  </button>
-                  <button className="text-xs font-bold hover:text-primary focus:outline-none">
-                    GIF
-                  </button>
-                  <button className="hover:text-primary focus:outline-none">
-                    <i className="fas fa-sticky-note"></i>
-                  </button>
-                </div>
                 <input
                   type="text"
-                  placeholder="Comment as Saiful Islam Shihab"
+                  value={commentText}
+                  onChange={(e) => setCommentText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') void submitComment();
+                  }}
+                  placeholder={`Commenter en tant que ${firstName}`}
                   className="flex-1 bg-transparent text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none dark:text-gray-200 dark:placeholder:text-gray-500"
                 />
-                <button className="text-primary hover:opacity-80 focus:outline-none">
+                <button
+                  onClick={() => void submitComment()}
+                  className="text-primary hover:opacity-80 focus:outline-none"
+                >
                   <i className="fas fa-paper-plane"></i>
                 </button>
               </div>
